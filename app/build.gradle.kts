@@ -1,20 +1,25 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.kapt)
+    kotlin("plugin.serialization") version "2.0.21"
+    id("app.cash.sqldelight")
 }
 
+val name = "com.Ace777.steady"
 android {
-    namespace = "com.example.steady"
+    namespace = name
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.steady"
+        applicationId = name
         minSdk = 24
+        //noinspection OldTargetApi
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -27,6 +32,11 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+            isMinifyEnabled = false
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -35,9 +45,40 @@ android {
     buildFeatures {
         compose = true
     }
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
 }
 
+sqldelight {
+    databases {
+        create("AppDatabase") {
+            packageName.set("com.steady.db")
+            version = 4
+        }
+    }
+}
 dependencies {
+
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.androidx.ui.graphics)
+
+    // Jetpack Compose integration
+    implementation(libs.androidx.navigation.compose)
+
+    // Views/Fragments integration
+    implementation(libs.androidx.navigation.fragment)
+    implementation(libs.androidx.navigation.ui)
+
+    // Testing Navigation
+    androidTestImplementation(libs.androidx.navigation.testing)
+
+    // JSON serialization library, works with the Kotlin serialization plugin
+    implementation(libs.kotlinx.serialization.json)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -53,4 +94,15 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    implementation(libs.androidx.compose.material.icons.extended.v20240900)
+    implementation(libs.gson)
+    implementation(libs.androidx.lifecycle.process)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.compose.ui.text.google.fonts)
+    implementation(libs.androidx.core.splashscreen)
+
+    implementation(libs.android.driver)
+    implementation(libs.coroutines.extensions1) // for flow
+    implementation(libs.androidx.datastore.preferences)
+
 }
