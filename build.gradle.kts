@@ -14,6 +14,7 @@ buildscript {
         mavenCentral()
     }
 
+
     dependencies {
         // Add the plugin
     }
