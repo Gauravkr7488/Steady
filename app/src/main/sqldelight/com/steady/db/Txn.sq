@@ -10,3 +10,6 @@ INSERT INTO Txn(
     amount
 )
 VALUES (?,?);
+
+getAll:
+SELECT * FROM Txn;

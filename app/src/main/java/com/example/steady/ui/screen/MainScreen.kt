@@ -42,7 +42,7 @@ fun MainScreen(dbOperation: DbOperation) {
         startDestination = Routes.HOME
     ) {
         composable(Routes.HOME) {
-            HomeScreen(navController)
+            HomeScreen(navController, sharedViewModel)
         }
 
         composable(Routes.ADD) {

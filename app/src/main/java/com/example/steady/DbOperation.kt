@@ -28,4 +28,7 @@ class DbOperation(
     suspend fun saveNewTxn(title: String, amount: Long) = withContext(Dispatchers.IO){
         tq.insert(title, amount)
     }
+    suspend fun getAll() = withContext(Dispatchers.IO){
+        tq.getAll().executeAsList()
+    }
 }
