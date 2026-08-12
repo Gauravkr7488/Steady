@@ -30,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,20 +39,22 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.navOptions
+import com.example.steady.SharedViewModel
 import com.example.steady.constant.Routes
 
 @Composable
 fun AddScreen(
-    navController: NavController
+    navController: NavController,
+    sharedViewModel: SharedViewModel
 ) {
     var title by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("") }
+    var amount by remember { mutableLongStateOf(0) }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-
+                    sharedViewModel.save(title, amount)
                     navController.navigate(
                         Routes.HOME,
                         navOptions = navOptions {
@@ -84,10 +87,10 @@ fun AddScreen(
                 label = { Text(("Title")) }
             )
             OutlinedTextField(
-                value = amount,
+                value = if (amount == 0L) "" else amount.toString(),
                 onValueChange = { newValue ->
                     if (newValue.all { it.isDigit() }) {
-                        amount = newValue
+                        amount = newValue.toLong()
                     }
                 },
                 keyboardOptions = KeyboardOptions(

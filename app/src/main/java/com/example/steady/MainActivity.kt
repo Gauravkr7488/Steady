@@ -11,9 +11,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val app = application as App
+        val db = app.database
+        val dbOperation = DbOperation(db)
         setContent {
             SteadyTheme {
-                MainScreen()
+                MainScreen(dbOperation)
             }
         }
     }

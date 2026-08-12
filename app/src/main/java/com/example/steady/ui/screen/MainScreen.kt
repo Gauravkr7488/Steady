@@ -17,24 +17,36 @@
 package com.example.steady.ui.screen
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.steady.DbOperation
+import com.example.steady.SharedViewModel
 import com.example.steady.constant.Routes
 
 @Composable
-fun MainScreen(){
+fun MainScreen(dbOperation: DbOperation) {
     val navController = rememberNavController()
+    val sharedViewModel = viewModel<SharedViewModel>(
+        factory = viewModelFactory {
+            initializer {
+                SharedViewModel(dbOperation)
+            }
+        }
+    )
     NavHost(
         navController = navController,
         startDestination = Routes.HOME
-    ){
+    ) {
         composable(Routes.HOME) {
             HomeScreen(navController)
         }
 
         composable(Routes.ADD) {
-            AddScreen(navController)
+            AddScreen(navController, sharedViewModel)
         }
     }
 }
