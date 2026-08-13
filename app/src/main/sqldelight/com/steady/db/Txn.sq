@@ -4,6 +4,19 @@ CREATE TABLE Txn (
     amount INTEGER
 );
 
+CREATE TABLE Tag(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE TxnTag (
+    txn_id INTEGER NOT NULL,
+    tag_id INTEGER NOT NULL,
+    PRIMARY KEY (txn_id, tag_id),
+    FOREIGN KEY (txn_id) REFERENCES Txn(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES Tag(id) ON DELETE CASCADE
+);
+
 insert:
 INSERT INTO Txn(
     title,
@@ -13,3 +26,15 @@ VALUES (?,?);
 
 getAll:
 SELECT * FROM Txn;
+
+createNewTag:
+INSERT INTO Tag(name) VALUES (?);
+
+addTag:
+INSERT INTO TxnTag(txn_id, tag_id) VALUES (?,?);
+
+getAllTags:
+SELECT * FROM Tag;
+
+getLastRowInsertId:
+SELECT last_insert_rowid();
