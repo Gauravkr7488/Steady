@@ -6,7 +6,7 @@ CREATE TABLE Txn (
 
 CREATE TABLE Tag(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE
+    name TEXT NOT NULL
 );
 
 CREATE TABLE TxnTag (
@@ -26,3 +26,15 @@ VALUES (?,?);
 
 getAll:
 SELECT * FROM Txn;
+
+createNewTag:
+INSERT INTO Tag(name) VALUES (?);
+
+addTag:
+INSERT INTO TxnTag(txn_id, tag_id) VALUES (?,?);
+
+getAllTags:
+SELECT * FROM Tag;
+
+getLastRowInsertId:
+SELECT last_insert_rowid();

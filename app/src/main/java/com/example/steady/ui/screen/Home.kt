@@ -17,7 +17,6 @@
 package com.example.steady.ui.screen
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,7 +40,6 @@ import androidx.navigation.NavController
 import com.example.steady.SharedViewModel
 import com.example.steady.constant.Routes
 import com.steady.db.Txn
-import kotlin.collections.emptyList
 
 @Composable
 fun HomeScreen(
@@ -76,8 +74,8 @@ fun HomeScreen(
             }
 
             LazyColumn {
-                items(txnList, key = {it.id}){
-                    Row {
+                items(txnList, key = { it.id }) {
+                    Column {
                         Text(it.title)
                         Text(it.amount.toString())
                     }

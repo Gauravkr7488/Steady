@@ -31,4 +31,23 @@ class DbOperation(
     suspend fun getAll() = withContext(Dispatchers.IO){
         tq.getAll().executeAsList()
     }
+    suspend fun addTag(tagId: Long, txnId: Long) = withContext(Dispatchers.IO){
+        tq.addTag(
+            txn_id = txnId,
+            tag_id = tagId
+        )
+    }
+
+    suspend fun createNewTag(name: String) = withContext(Dispatchers.IO) {
+        tq.createNewTag(name)
+    }
+
+    suspend fun getAllTags() = withContext(Dispatchers.IO) {
+        tq.getAllTags().executeAsList()
+    }
+
+    suspend fun getLastRowInsertId() = withContext(Dispatchers.IO) {
+        return@withContext tq.getLastRowInsertId().executeAsOne()
+    }
+
 }
