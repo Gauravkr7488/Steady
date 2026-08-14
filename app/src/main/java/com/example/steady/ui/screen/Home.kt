@@ -83,13 +83,15 @@ fun HomeScreen(
                 .padding(top = innerPadding.calculateTopPadding())
                 .padding(start = 5.dp, end = 5.dp)
         ) {
+            var data: List<Pair<Txn, List<Tag>>> by remember { mutableStateOf(emptyList()) }
             LaunchedEffect(Unit) {
-                txnList = sharedViewModel.getAll()
+                txnList = sharedViewModel.getAllTxns()
+                data = txnList.map { it to sharedViewModel.getTags(it.id) }
             }
 
             LazyColumn {
-                items(txnList, key = { it.id }) {
-                    TxnCard(it, emptyList())
+                items(data, key = { it.first.id }) {
+                    TxnCard(it.first, it.second)
                 }
             }
         }
@@ -103,6 +105,7 @@ fun TxnCard(txn: Txn, tags: List<Tag>) {
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.padding(vertical = 1.dp) // spacer
     ) {
         Row(
             modifier = Modifier
