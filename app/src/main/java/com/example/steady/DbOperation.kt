@@ -50,4 +50,7 @@ class DbOperation(
         return@withContext tq.getLastRowInsertId().executeAsOne()
     }
 
+    suspend fun getTagListByTxnId(txnId: Long) = withContext(Dispatchers.IO) {
+        return@withContext tq.getTagListByTxnId(txn_id = txnId).executeAsList()
+    }
 }

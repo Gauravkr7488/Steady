@@ -38,3 +38,8 @@ SELECT * FROM Tag;
 
 getLastRowInsertId:
 SELECT last_insert_rowid();
+
+getTagListByTxnId:
+SELECT Tag.* FROM Tag
+JOIN TxnTag ON Tag.id = TxnTag.tag_id
+WHERE TxnTag.txn_id = ?;

@@ -14,7 +14,7 @@ class SharedViewModel(
         return dbOperation.getLastRowInsertId()
     }
 
-    suspend fun getAll(): List<Txn> {
+    suspend fun getAllTxns(): List<Txn> {
         return dbOperation.getAll()
     }
 
@@ -33,5 +33,9 @@ class SharedViewModel(
     suspend fun getAllTags(): List<Tag> {
         return dbOperation.getAllTags()
 
+    }
+
+    suspend fun getTags(txnId: Long): List<Tag> {
+        return dbOperation.getTagListByTxnId(txnId)
     }
 }
