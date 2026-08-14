@@ -19,8 +19,10 @@ package com.example.steady.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -118,25 +120,23 @@ fun TxnCard(txn: Txn, tags: List<Tag>) {
                     .weight(1f)
                     .padding(top = 16.dp, bottom = 16.dp)
             ) {
-                Text(
-                    text = txn.title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    overflow = TextOverflow.Ellipsis,
-                )
-//                if (task.description.isNotBlank()) {
-//                    Spacer(modifier = Modifier.height(2.dp))
-//                    Text(
-//                        text = task.description,
-//                        style = MaterialTheme.typography.bodySmall,
-//                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                        maxLines = 1,
-//                        overflow = TextOverflow.Ellipsis
-//                    )
-//                }
-            }
-            Column {
-                tags.forEach { tag ->
-                    Badge(tag.name)
+                Row {
+                    Text(
+                        text = txn.title,
+                        style = MaterialTheme.typography.bodyLarge,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(Modifier.weight(0.5f))
+                    Text(
+                        text = txn.amount.toString(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Row(Modifier.height(16.dp)) {
+                    tags.forEach { tag ->
+                        Badge(tag.name)
+                    }
                 }
             }
         }
