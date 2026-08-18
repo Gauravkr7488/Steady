@@ -77,7 +77,6 @@ fun AddScreen(
 ) {
     var title by remember { mutableStateOf("") }
     var amount by remember { mutableLongStateOf(0) }
-    var showCreateNewTag by remember { mutableStateOf(false) }
     var txnTagList by remember { mutableStateOf(emptyList<Tag>()) }
     var availableTagList by remember { mutableStateOf(emptyList<Tag>()) }
     val coroutineScope = rememberCoroutineScope()
@@ -165,39 +164,10 @@ fun AddScreen(
             )
             TagMenu(
                 tags = txnTagList,
-                availableTagList = availableTagList
-            ) { txnTagList = it }
-
-            TextButton(onClick = {
-                showCreateNewTag = true
-            }) {
-                Text("Create New")
-            }
-
-            if (showCreateNewTag) {
-                var text by remember { mutableStateOf("") }
-                TidyDialog(
-                    title = "Create New Tag",
-                    buttons = {
-                        TextButton(onClick = {
-                            sharedViewModel.createNewTag(text)
-                        }) {
-                            Text("Create")
-                        }
-                        TextButton(onClick = {
-                            showCreateNewTag = false
-                        }) {
-                            Text("Cancel")
-                        }
-                    },
-                    onDismissRequest = { showCreateNewTag = false },
-                ) {
-                    OutlinedTextField(
-                        value = text,
-                        onValueChange = { text = it }
-                    )
-                }
-            }
+                availableTagList = availableTagList,
+                onAdd = { txnTagList = it },
+                onCreateNew = { sharedViewModel.createNewTag(it) }
+            )
         }
     }
 }
@@ -207,10 +177,12 @@ fun AddScreen(
 fun TagMenu(
     tags: List<Tag>,
     availableTagList: List<Tag>,
-    onAdd: (List<Tag>) -> Unit
+    onAdd: (List<Tag>) -> Unit,
+    onCreateNew: (String) -> Unit
 ) {
     var showViewDialog by remember { mutableStateOf(false) }
     var showAddDialog by remember { mutableStateOf(false) }
+    var showCrateNewDialog by remember { mutableStateOf(false) }
     OutlinedMenuItem(
         menuName = "Tag",
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow
@@ -248,6 +220,41 @@ fun TagMenu(
             }
         }
     }
+    if (showCrateNewDialog) {
+        val focusRequester = remember { FocusRequester() }
+        val keyboardController = LocalSoftwareKeyboardController.current
+
+        var text by remember { mutableStateOf("") }
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+            keyboardController?.show()
+        }
+        TidyDialog(
+            title = "Create New Tag",
+            buttons = {
+                TextButton(onClick = {
+                    showCrateNewDialog = false
+                }) {
+                    Text("Cancel")
+                }
+
+                TextButton(onClick = {
+                    onCreateNew(text)
+                    showCrateNewDialog = false
+                }) {
+                    Text("Create")
+                }
+            },
+            onDismissRequest = { showCrateNewDialog = false },
+        ) {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it },
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+            )
+        }
+    }
     if (showAddDialog) {
         var list: List<Tag> by remember { mutableStateOf(emptyList()) }
         TidyDialog(
@@ -257,11 +264,20 @@ fun TagMenu(
                 TextButton(onClick = { showAddDialog = false }) {
                     Text("Cancel")
                 }
-                TextButton(onClick = {
-                    onAdd(list)
-                    showAddDialog = false
-                }) {
-                    Text("Ok")
+                if (list.isEmpty()) {
+                    TextButton(onClick = {
+                        showAddDialog = false
+                        showCrateNewDialog = true
+                    }) {
+                        Text("Create New")
+                    }
+                } else {
+                    TextButton(onClick = {
+                        onAdd(list)
+                        showAddDialog = false
+                    }) {
+                        Text("Add")
+                    }
                 }
             }
         ) {
