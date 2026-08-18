@@ -14,16 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("AssignedValueIsNeverRead")
+
 package com.example.steady.ui.screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -51,14 +53,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.navOptions
 import com.example.steady.SharedViewModel
 import com.example.steady.constant.Routes
+import com.example.steady.ui.component.button.RoundedOutlineButtonTidy
+import com.example.steady.ui.component.dialog.TidyDialog
+import com.example.steady.ui.component.menu.OutlinedMenuItem
 import com.steady.db.Tag
 import kotlinx.coroutines.launch
 
@@ -69,11 +77,19 @@ fun AddScreen(
 ) {
     var title by remember { mutableStateOf("") }
     var amount by remember { mutableLongStateOf(0) }
-    var showCreateNewTag by remember { mutableStateOf(false) }
-    var showAddTag by remember { mutableStateOf(false) }
     var txnTagList by remember { mutableStateOf(emptyList<Tag>()) }
     var availableTagList by remember { mutableStateOf(emptyList<Tag>()) }
     val coroutineScope = rememberCoroutineScope()
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+        keyboardController?.show()
+        availableTagList = sharedViewModel.getAllTags()
+
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
@@ -108,13 +124,27 @@ fun AddScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = innerPadding.calculateTopPadding())
-                .padding(start = 5.dp, end = 5.dp)
+                .padding(horizontal = 16.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        keyboardController?.hide()
+                    })
+                },
+            verticalArrangement = Arrangement.spacedBy(5.dp)
+
         ) {
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
                 singleLine = true,
-                label = { Text(("Title")) }
+                label = { Text(("Title")) },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                ),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester)
             )
             OutlinedTextField(
                 value = if (amount == 0L) "" else amount.toString(),
@@ -127,121 +157,166 @@ fun AddScreen(
                     keyboardType = KeyboardType.Number
                 ),
                 singleLine = true,
-                label = { Text(("Amount")) }
-            )
-            TextButton(onClick = {
-                showAddTag = true
-            }) {
-                Text("Add Tag")
-            }
-            TextButton(onClick = {
-                showCreateNewTag = true
-            }) {
-                Text("Create New")
-            }
-            Text("Tag count = ${txnTagList.size}")
-            if (showCreateNewTag) {
-                var text by remember { mutableStateOf("") }
-                TidyDialog(
-                    title = "Create New Tag",
-                    buttons = {
-                        TextButton(onClick = {
-                            sharedViewModel.createNewTag(text)
-                        }) {
-                            Text("Create")
-                        }
-                        TextButton(onClick = {
-                            showCreateNewTag = false
-                        }) {
-                            Text("Cancel")
-                        }
-                    },
-                    onDismissRequest = { showCreateNewTag = false },
-                ) {
-                    OutlinedTextField(
-                        value = text,
-                        onValueChange = { text = it }
-                    )
-                }
-            }
-            if (showAddTag) {
-                val list = mutableListOf<Tag>()
-                LaunchedEffect(Unit) {
-                    availableTagList = sharedViewModel.getAllTags()
-                }
-                TidyDialog(
-                    title = "Add Tag",
-                    onDismissRequest = { showAddTag = false },
-                    buttons = {
+                label = { Text(("Amount")) },
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
 
-                        TextButton(onClick = {
-                            txnTagList = list
-                            showAddTag = false
-                        }) {
-                            Text("Add")
-                        }
-                        TextButton(onClick = {
-                            list.clear()
-                            showAddTag = false
-                        }) {
-                            Text("Cancel")
-                        }
-                    }
-                ) {
-                    LazyColumn {
-                        items(availableTagList, key = { it.id }) { tag ->
-                            Row(
-                                modifier = Modifier
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(onTap = {
-                                            list += tag
-                                        })
-                                    }) {
-                                Text(tag.name)
-                            }
-                        }
-                    }
-                }
-            }
+            )
+            TagMenu(
+                tags = txnTagList,
+                availableTagList = availableTagList,
+                onAdd = { txnTagList = it },
+                onCreateNew = { sharedViewModel.createNewTag(it) }
+            )
         }
     }
 }
 
 
 @Composable
-fun TidyDialog(
-    title: String,
-    onDismissRequest: () -> Unit,
-    modifier: Modifier = Modifier,
-    buttons: @Composable RowScope.() -> Unit,
-    content: @Composable ColumnScope.() -> Unit
-
+fun TagMenu(
+    tags: List<Tag>,
+    availableTagList: List<Tag>,
+    onAdd: (List<Tag>) -> Unit,
+    onCreateNew: (String) -> Unit
 ) {
-    Dialog(onDismissRequest = onDismissRequest) {
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+    var showViewDialog by remember { mutableStateOf(false) }
+    var showAddDialog by remember { mutableStateOf(false) }
+    var showCrateNewDialog by remember { mutableStateOf(false) }
+    OutlinedMenuItem(
+        menuName = "Tag",
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+    ) {
+        RoundedOutlineButtonTidy(
+            text = if (tags.isEmpty()) "Add" else "View",
+            onClick = { if (tags.isEmpty()) showAddDialog = true else showViewDialog = true }
+        )
+    }
+    if (showViewDialog) {
+        TidyDialog(
+            title = "Tags",
+            onDismissRequest = { showViewDialog = false },
+            buttons = {
+                TextButton(onClick = { showViewDialog = false }) {
+                    Text("Close")
+                }
+                TextButton(onClick = { showAddDialog = true }) {
+                    Text("Add")
+                }
+            }
         ) {
-            Column(
-                modifier = modifier
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 300.dp)
+                    .padding(bottom = 5.dp),
             ) {
-                Text(
-                    title,
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(8.dp)
-                )
-                content()
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Absolute.Right
+                items(
+                    items = tags
                 ) {
-                    buttons()
+                    Row { Text(it.name) }
+                }
+            }
+        }
+    }
+    if (showCrateNewDialog) {
+        val focusRequester = remember { FocusRequester() }
+        val keyboardController = LocalSoftwareKeyboardController.current
+
+        var text by remember { mutableStateOf("") }
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+            keyboardController?.show()
+        }
+        TidyDialog(
+            title = "Create New Tag",
+            buttons = {
+                TextButton(onClick = {
+                    showCrateNewDialog = false
+                }) {
+                    Text("Cancel")
+                }
+
+                TextButton(onClick = {
+                    onCreateNew(text)
+                    showCrateNewDialog = false
+                }) {
+                    Text("Create")
+                }
+            },
+            onDismissRequest = { showCrateNewDialog = false },
+        ) {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it },
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+            )
+        }
+    }
+    if (showAddDialog) {
+        var list: List<Tag> by remember { mutableStateOf(emptyList()) }
+        TidyDialog(
+            title = "Select Tags",
+            onDismissRequest = { showAddDialog = false },
+            buttons = {
+                TextButton(onClick = { showAddDialog = false }) {
+                    Text("Cancel")
+                }
+                if (list.isEmpty()) {
+                    TextButton(onClick = {
+                        showAddDialog = false
+                        showCrateNewDialog = true
+                    }) {
+                        Text("Create New")
+                    }
+                } else {
+                    TextButton(onClick = {
+                        onAdd(list)
+                        showAddDialog = false
+                    }) {
+                        Text("Add")
+                    }
+                }
+            }
+        ) {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                items(availableTagList, key = { it.id }) { tag ->
+                    val cardColor = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
+                    val border = if (list.contains(tag)) BorderStroke(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                    ) else null
+                    Card(
+                        shape = RoundedCornerShape(12.dp),
+                        border = border,
+                        colors = cardColor,
+                        modifier = Modifier
+                            .pointerInput(Unit) {
+                                detectTapGestures(onTap = {
+                                    if (list.contains(tag)) {
+                                        list -= tag
+                                    } else {
+                                        list += tag
+                                    }
+                                })
+                            }
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(tag.name)
+                        }
+                    }
                 }
             }
         }
