@@ -51,7 +51,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -74,6 +78,14 @@ fun AddScreen(
     var txnTagList by remember { mutableStateOf(emptyList<Tag>()) }
     var availableTagList by remember { mutableStateOf(emptyList<Tag>()) }
     val coroutineScope = rememberCoroutineScope()
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+        keyboardController?.show()
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
@@ -108,13 +120,22 @@ fun AddScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = innerPadding.calculateTopPadding())
-                .padding(start = 5.dp, end = 5.dp)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp)
+
         ) {
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
                 singleLine = true,
-                label = { Text(("Title")) }
+                label = { Text(("Title")) },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                ),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester)
             )
             OutlinedTextField(
                 value = if (amount == 0L) "" else amount.toString(),
@@ -127,7 +148,10 @@ fun AddScreen(
                     keyboardType = KeyboardType.Number
                 ),
                 singleLine = true,
-                label = { Text(("Amount")) }
+                label = { Text(("Amount")) },
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
+
             )
             TextButton(onClick = {
                 showAddTag = true
