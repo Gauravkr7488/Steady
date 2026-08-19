@@ -79,6 +79,7 @@ fun AddScreen(
     var amount by remember { mutableLongStateOf(0) }
     var txnTagList by remember { mutableStateOf(emptyList<Tag>()) }
     var allTags by remember { mutableStateOf(emptyList<Tag>()) }
+    var newTags by remember { mutableStateOf(emptyList<Tag>()) }
     val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -100,6 +101,9 @@ fun AddScreen(
                             var tagId = it.id
                             if (tagId == 0L) tagId = sharedViewModel.saveTag(it.name)
                             sharedViewModel.addTag(tagId, txnId)
+                        }
+                        newTags.forEach {
+                            if (!txnTagList.contains(it)) sharedViewModel.saveTag(it.name)
                         }
                         navController.navigate(
                             Routes.HOME,
@@ -165,12 +169,12 @@ fun AddScreen(
             )
             TagMenu(
                 txnTags = txnTagList,
-                availableTagList = allTags,
+                availableTagList = allTags + newTags,
                 onAdd = { txnTagList = it },
                 onCreateNew = {
-                    allTags += Tag(0, it)
+                    newTags += Tag(0, it)
                 },
-                allTags = allTags
+                allTags = allTags + newTags
             )
         }
     }
