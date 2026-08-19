@@ -78,7 +78,7 @@ fun AddScreen(
     var title by remember { mutableStateOf("") }
     var amount by remember { mutableLongStateOf(0) }
     var txnTagList by remember { mutableStateOf(emptyList<Tag>()) }
-    var availableTagList by remember { mutableStateOf(emptyList<Tag>()) }
+    var allTags by remember { mutableStateOf(emptyList<Tag>()) }
     val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -86,8 +86,7 @@ fun AddScreen(
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
         keyboardController?.show()
-        availableTagList = sharedViewModel.getAllTags()
-
+        allTags = sharedViewModel.getAllTags()
     }
 
     Scaffold(
@@ -165,12 +164,13 @@ fun AddScreen(
 
             )
             TagMenu(
-                tags = txnTagList,
-                availableTagList = availableTagList,
+                txnTags = txnTagList,
+                availableTagList = allTags,
                 onAdd = { txnTagList = it },
                 onCreateNew = {
-                    availableTagList += Tag(0, it)
-                }
+                    allTags += Tag(0, it)
+                },
+                allTags = allTags
             )
         }
     }
@@ -179,8 +179,9 @@ fun AddScreen(
 
 @Composable
 fun TagMenu(
-    tags: List<Tag>,
+    txnTags: List<Tag>,
     availableTagList: List<Tag>,
+    allTags: List<Tag>,
     onAdd: (List<Tag>) -> Unit,
     onCreateNew: (String) -> Unit
 ) {
@@ -192,8 +193,8 @@ fun TagMenu(
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow
     ) {
         RoundedOutlineButtonTidy(
-            text = if (tags.isEmpty()) "Add" else "View",
-            onClick = { if (tags.isEmpty()) showAddDialog = true else showViewDialog = true }
+            text = if (txnTags.isEmpty()) "Add" else "View",
+            onClick = { if (txnTags.isEmpty()) showAddDialog = true else showViewDialog = true }
         )
     }
     if (showViewDialog) {
@@ -217,7 +218,7 @@ fun TagMenu(
                     .padding(bottom = 5.dp),
             ) {
                 items(
-                    items = tags
+                    items = txnTags
                 ) {
                     Row { Text(it.name) }
                 }
@@ -233,6 +234,9 @@ fun TagMenu(
             focusRequester.requestFocus()
             keyboardController?.show()
         }
+        val isInvalid = allTags.any {
+            it.name == text
+        }
         TidyDialog(
             title = "Create New Tag",
             buttons = {
@@ -243,17 +247,22 @@ fun TagMenu(
                 }
 
                 TextButton(onClick = {
-                    onCreateNew(text)
-                    showCrateNewDialog = false
+                    if (!isInvalid) {
+                        onCreateNew(text)
+                        showCrateNewDialog = false
+                    }
                 }) {
                     Text("Create")
                 }
             },
             onDismissRequest = { showCrateNewDialog = false },
         ) {
+            val labelText = if (isInvalid) "duplicate name" else "tag name"
             OutlinedTextField(
+                label = { Text(labelText) },
                 value = text,
                 onValueChange = { text = it },
+                isError = isInvalid,
                 modifier = Modifier
                     .focusRequester(focusRequester)
             )
