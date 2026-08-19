@@ -96,9 +96,11 @@ fun AddScreen(
             FloatingActionButton(
                 onClick = {
                     coroutineScope.launch {
-                        val id = sharedViewModel.save(title, amount)
+                        val txnId = sharedViewModel.save(title, amount)
                         txnTagList.forEach {
-                            sharedViewModel.addTag(it.id, id)
+                            var tagId = it.id
+                            if (tagId == 0L) tagId = sharedViewModel.saveTag(it.name)
+                            sharedViewModel.addTag(tagId, txnId)
                         }
                         navController.navigate(
                             Routes.HOME,
@@ -166,7 +168,9 @@ fun AddScreen(
                 tags = txnTagList,
                 availableTagList = availableTagList,
                 onAdd = { txnTagList = it },
-                onCreateNew = { sharedViewModel.createNewTag(it) }
+                onCreateNew = {
+                    availableTagList += Tag(0, it)
+                }
             )
         }
     }
@@ -284,7 +288,7 @@ fun TagMenu(
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                items(availableTagList, key = { it.id }) { tag ->
+                items(availableTagList, key = { it.name }) { tag ->
                     val cardColor = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer
                     )

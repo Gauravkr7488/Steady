@@ -24,10 +24,8 @@ class SharedViewModel(
         }
     }
 
-    fun createNewTag(name: String) {
-        viewModelScope.launch {
-            dbOperation.createNewTag(name = name)
-        }
+    suspend fun saveTag(name: String): Long {
+        return dbOperation.saveTag(name = name)
     }
 
     suspend fun getAllTags(): List<Tag> {

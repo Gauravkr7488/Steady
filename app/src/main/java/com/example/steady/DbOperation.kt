@@ -38,8 +38,9 @@ class DbOperation(
         )
     }
 
-    suspend fun createNewTag(name: String) = withContext(Dispatchers.IO) {
+    suspend fun saveTag(name: String) = withContext(Dispatchers.IO) {
         tq.createNewTag(name)
+        return@withContext tq.getLastRowInsertId().executeAsOne()
     }
 
     suspend fun getAllTags() = withContext(Dispatchers.IO) {
