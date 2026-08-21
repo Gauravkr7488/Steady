@@ -43,3 +43,8 @@ getTagListByTxnId:
 SELECT Tag.* FROM Tag
 JOIN TxnTag ON Tag.id = TxnTag.tag_id
 WHERE TxnTag.txn_id = ?;
+
+getTxnListByTagId:
+SELECT Txn.* FROM Txn
+JOIN TxnTag ON Txn.id = TxnTag.txn_id
+WHERE TxnTag.tag_id = ?;

@@ -26,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.steady.DbOperation
 import com.example.steady.SharedViewModel
 import com.example.steady.constant.Routes
+import com.example.steady.viewmodel.TagViewModel
 
 @Composable
 fun MainScreen(dbOperation: DbOperation) {
@@ -34,6 +35,13 @@ fun MainScreen(dbOperation: DbOperation) {
         factory = viewModelFactory {
             initializer {
                 SharedViewModel(dbOperation)
+            }
+        }
+    )
+    val tagViewModel = viewModel<TagViewModel>(
+        factory = viewModelFactory {
+            initializer {
+                TagViewModel(dbOperation)
             }
         }
     )
@@ -47,6 +55,13 @@ fun MainScreen(dbOperation: DbOperation) {
 
         composable(Routes.ADD) {
             AddScreen(navController, sharedViewModel)
+        }
+
+        composable(Routes.TAG_LIST) {
+            TagListScreen(navController, tagViewModel)
+        }
+        composable(Routes.TAG) {
+            TagScreen(navController, tagViewModel)
         }
     }
 }
