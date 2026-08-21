@@ -28,7 +28,9 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.steady.SharedViewModel
+import com.example.steady.Utils
 import com.example.steady.constant.Routes
 import com.example.steady.ui.component.card.TxnCard
 import com.steady.db.Tag
@@ -92,8 +95,20 @@ fun HomeScreen(
             }
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                items(data, key = { it.first.id }) {
-                    TxnCard(it.first, it.second)
+                val group = data
+                    .sortedByDescending { it.first.createdAt }
+                    .groupBy { Utils.formatDayHeader(it.first.createdAt) }
+                group.forEach { (label, txnData) ->
+                    item(key = label) {
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
+                    }
+                    items(txnData, key = { it.first.id }) {
+                        TxnCard(it.first, it.second)
+                    }
                 }
             }
         }

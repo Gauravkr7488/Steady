@@ -1,7 +1,8 @@
 CREATE TABLE Txn (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
-    amount INTEGER
+    amount INTEGER NOT NULL,
+    createdAt INTEGER NOT NULL
 );
 
 CREATE TABLE Tag(
@@ -20,9 +21,14 @@ CREATE TABLE TxnTag (
 insert:
 INSERT INTO Txn(
     title,
-    amount
+    amount,
+    createdAt
 )
-VALUES (?,?);
+VALUES (
+?,
+?,
+?
+);
 
 getAll:
 SELECT * FROM Txn;
