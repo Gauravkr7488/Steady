@@ -17,9 +17,58 @@
 package com.example.steady
 
 import com.steady.db.Tag
+import com.steady.db.Txn
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 object Utils {
     fun getEmptyTag(): Tag {
         return Tag(0, "")
+    }
+
+    fun getEmptyTxn(): Txn {
+        return Txn(
+            id = 0,
+            title = "",
+            amount = 0,
+            createdAt = System.currentTimeMillis()
+        )
+    }
+
+    fun changeDateFormat(date: Long, pattern: String): String {
+        return SimpleDateFormat(pattern, Locale.getDefault()).apply {
+            timeZone = TimeZone.getDefault()
+        }.format(Date(date))
+    }
+
+    fun getYesterday(): Long {
+        val date = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, -1)
+        }.timeInMillis
+        return getDayMillis(date)
+    }
+
+    fun formatDayHeader(millis: Long): String {
+        val dayMilli = getDayMillis(millis)
+        val today = getDayMillis(System.currentTimeMillis())
+        val yesterday = getYesterday()
+        return when (dayMilli) {
+            today -> "Today"
+            yesterday -> "Yesterday"
+            else -> changeDateFormat(millis, "dd MMM YYYY")
+        }
+    }
+
+    fun getDayMillis(millis: Long): Long {
+        return Calendar.getInstance().apply {
+            timeInMillis = millis
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
     }
 }
