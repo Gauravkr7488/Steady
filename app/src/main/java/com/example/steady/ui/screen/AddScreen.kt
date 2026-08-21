@@ -68,6 +68,7 @@ import com.example.steady.ui.component.button.RoundedOutlineButtonTidy
 import com.example.steady.ui.component.dialog.TidyDialog
 import com.example.steady.ui.component.menu.OutlinedMenuItem
 import com.steady.db.Tag
+import com.steady.db.Txn
 import kotlinx.coroutines.launch
 
 @Composable
@@ -96,7 +97,13 @@ fun AddScreen(
             FloatingActionButton(
                 onClick = {
                     coroutineScope.launch {
-                        val txnId = sharedViewModel.save(title, amount)
+                        val txn = Txn(
+                            id = 0,
+                            title = title,
+                            amount = amount,
+                            createdAt = System.currentTimeMillis()
+                        )
+                        val txnId = sharedViewModel.save(txn)
                         txnTagList.forEach {
                             var tagId = it.id
                             if (tagId == 0L) tagId = sharedViewModel.saveTag(it.name)

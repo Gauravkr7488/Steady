@@ -17,6 +17,7 @@
 package com.example.steady
 
 import com.steady.db.AppDatabase
+import com.steady.db.Txn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -25,13 +26,19 @@ class DbOperation(
 ) {
     private val tq = db.txnQueries
 
-    suspend fun saveNewTxn(title: String, amount: Long) = withContext(Dispatchers.IO){
-        tq.insert(title, amount)
+    suspend fun saveNewTxn(txn: Txn) = withContext(Dispatchers.IO) {
+        tq.insert(
+            title = txn.title,
+            amount = txn.amount,
+            createdAt = txn.createdAt
+        )
     }
-    suspend fun getAll() = withContext(Dispatchers.IO){
+
+    suspend fun getAll() = withContext(Dispatchers.IO) {
         tq.getAll().executeAsList()
     }
-    suspend fun addTag(tagId: Long, txnId: Long) = withContext(Dispatchers.IO){
+
+    suspend fun addTag(tagId: Long, txnId: Long) = withContext(Dispatchers.IO) {
         tq.addTag(
             txn_id = txnId,
             tag_id = tagId
