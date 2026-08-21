@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -52,15 +53,28 @@ fun HomeScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate(Routes.ADD) },
-                modifier = Modifier.size(80.dp)
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                FloatingActionButton(
+                    onClick = { navController.navigate(Routes.TAG_LIST) },
+                    modifier = Modifier.size(80.dp)
 
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Create,
-                    contentDescription = "Create new Task"
-                )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Tag,
+                        contentDescription = ""
+                    )
+                }
+
+                FloatingActionButton(
+                    onClick = { navController.navigate(Routes.ADD) },
+                    modifier = Modifier.size(80.dp)
+
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Create,
+                        contentDescription = "Create new Task"
+                    )
+                }
             }
         }
 

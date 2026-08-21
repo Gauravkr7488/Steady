@@ -54,4 +54,8 @@ class DbOperation(
     suspend fun getTagListByTxnId(txnId: Long) = withContext(Dispatchers.IO) {
         return@withContext tq.getTagListByTxnId(txn_id = txnId).executeAsList()
     }
+
+    suspend fun getTxnListByTagId(tagId: Long) = withContext(Dispatchers.IO) {
+        return@withContext tq.getTxnListByTagId(tag_id = tagId).executeAsList()
+    }
 }
