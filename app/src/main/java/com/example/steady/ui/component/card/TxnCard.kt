@@ -41,7 +41,7 @@ import com.steady.db.Txn
 fun TxnCard(txn: Txn, tags: List<Tag>) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
         shape = RoundedCornerShape(12.dp),
     ) {
