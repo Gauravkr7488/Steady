@@ -88,7 +88,7 @@ fun TagListScreen(
 @Composable
 fun TagCard(tag: Tag, onClick: (id: Long) -> Unit) {
     val cardColor = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.primaryContainer
+        containerColor = MaterialTheme.colorScheme.secondaryContainer
     )
     Card(
         shape = RoundedCornerShape(12.dp),
