@@ -25,7 +25,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Tag
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -74,8 +76,21 @@ fun HomeScreen(
 
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Create,
-                        contentDescription = "Create new Task"
+                        imageVector = Icons.Default.Download,
+                        contentDescription = "Received"
+                    )
+                }
+                FloatingActionButton(
+                    onClick = {
+                        sharedViewModel.spentFlag = true
+                        navController.navigate(Routes.ADD)
+                    },
+                    modifier = Modifier.size(80.dp)
+
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Upload,
+                        contentDescription = "Spent"
                     )
                 }
             }

@@ -1,5 +1,8 @@
 package com.example.steady
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.steady.db.Tag
@@ -36,4 +39,16 @@ class SharedViewModel(
     suspend fun getTags(txnId: Long): List<Tag> {
         return dbOperation.getTagListByTxnId(txnId)
     }
+
+    private var _spentFlag by mutableStateOf(false)
+
+    var spentFlag: Boolean
+        get() {
+            val value = _spentFlag
+            _spentFlag = false
+            return value
+        }
+        set(value) {
+            _spentFlag = value
+        }
 }
