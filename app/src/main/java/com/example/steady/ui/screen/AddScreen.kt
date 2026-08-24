@@ -84,11 +84,13 @@ fun AddScreen(
     val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+    var spentFlag by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
         keyboardController?.show()
         allTags = sharedViewModel.getAllTags()
+        spentFlag = sharedViewModel.spentFlag
     }
 
     Scaffold(
@@ -100,7 +102,7 @@ fun AddScreen(
                         val txn = Txn(
                             id = 0,
                             title = title,
-                            amount = amount,
+                            amount = if (spentFlag) -amount else amount,
                             createdAt = System.currentTimeMillis()
                         )
                         val txnId = sharedViewModel.save(txn)
@@ -169,7 +171,10 @@ fun AddScreen(
                     keyboardType = KeyboardType.Number
                 ),
                 singleLine = true,
-                label = { Text(("Amount")) },
+                label = {
+                    val text = if (spentFlag) "Amount Spent" else "Amount Received"
+                    Text(text)
+                },
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
 
