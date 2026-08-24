@@ -22,7 +22,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,10 +34,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.steady.Utils
 import com.example.steady.ui.component.card.TxnCard
 import com.example.steady.viewmodel.TagViewModel
 import com.steady.db.Tag
 import com.steady.db.Txn
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 @Composable
 fun TagScreen(
@@ -60,8 +65,20 @@ fun TagScreen(
                 .padding(start = 5.dp, end = 5.dp)
         ) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                items(txnList, key = { it.id }) {
-                    TxnCard(it, listOf())
+                val group = txnList
+                    .sortedByDescending { it.createdAt }
+                    .groupBy { Utils.formatDayHeader(it.createdAt) }
+                group.forEach { (label, txnData) ->
+                    item(key = label) {
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
+                    }
+                    items(txnData, key = { it.id }) {
+                        TxnCard(it, listOf())
+                    }
                 }
             }
         }
