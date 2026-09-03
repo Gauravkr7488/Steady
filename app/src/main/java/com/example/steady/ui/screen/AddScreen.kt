@@ -164,7 +164,7 @@ fun AddScreen(
                 value = if (amount == 0L) "" else amount.toString(),
                 onValueChange = { newValue ->
                     if (newValue.all { it.isDigit() }) {
-                        amount = newValue.toLong()
+                        amount = if (newValue != "") newValue.toLong() else 0
                     }
                 },
                 keyboardOptions = KeyboardOptions(
