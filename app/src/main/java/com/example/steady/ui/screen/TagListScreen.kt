@@ -19,6 +19,7 @@ package com.example.steady.ui.screen
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -69,7 +70,8 @@ fun TagListScreen(
                 .padding(start = 5.dp, end = 5.dp)
         ) {
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(1.dp)
+                verticalArrangement = Arrangement.spacedBy(1.dp),
+                contentPadding = PaddingValues(bottom = 150.dp)
             ) {
                 items(tagList, key = { it.id }) { tag ->
                     TagCard(
