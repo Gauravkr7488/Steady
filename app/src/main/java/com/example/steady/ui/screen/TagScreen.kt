@@ -18,6 +18,8 @@ package com.example.steady.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,9 +30,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -47,7 +51,7 @@ fun TagScreen(
     navController: NavController,
     tagViewModel: TagViewModel
 
-){
+) {
     var tag: Tag by remember { mutableStateOf(Tag(0, "")) }
     var txnList: List<Txn> by remember { mutableStateOf(listOf()) }
     LaunchedEffect(Unit) {
@@ -64,6 +68,17 @@ fun TagScreen(
                 .padding(top = innerPadding.calculateTopPadding())
                 .padding(start = 5.dp, end = 5.dp)
         ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(8.dp)
+            ) {
+                var total = 0L
+                txnList.forEach { total += it.amount }
+                Text("Total")
+                Spacer(Modifier.weight(1f))
+                Text(total.toString(), style = MaterialTheme.typography.displayMedium)
+            }
+
             LazyColumn(verticalArrangement = Arrangement.spacedBy(1.dp)) {
                 val group = txnList
                     .sortedByDescending { it.createdAt }
