@@ -38,12 +38,17 @@ import com.steady.db.Tag
 import com.steady.db.Txn
 
 @Composable
-fun TxnCard(txn: Txn, tags: List<Tag>) {
+fun TxnCard(
+    txn: Txn,
+    tags: List<Tag>,
+    onClick: () -> Unit = {}
+) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
         shape = RoundedCornerShape(12.dp),
+        onClick = onClick
     ) {
         Column(
             verticalArrangement = Arrangement.Center,

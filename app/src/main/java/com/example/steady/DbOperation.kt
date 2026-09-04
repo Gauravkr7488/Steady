@@ -26,11 +26,19 @@ class DbOperation(
 ) {
     private val tq = db.txnQueries
 
-    suspend fun saveNewTxn(txn: Txn) = withContext(Dispatchers.IO) {
-        tq.insert(
+    suspend fun insertTxn(txn: Txn) = withContext(Dispatchers.IO) {
+        tq.insertTxn(
             title = txn.title,
             amount = txn.amount,
             createdAt = txn.createdAt
+        )
+    }
+
+    suspend fun updateTxn(txn: Txn) = withContext(Dispatchers.IO) {
+        tq.updateTxn(
+            title = txn.title,
+            amount = txn.amount,
+            id = txn.id,
         )
     }
 
@@ -64,5 +72,9 @@ class DbOperation(
 
     suspend fun getTxnListByTagId(tagId: Long) = withContext(Dispatchers.IO) {
         return@withContext tq.getTxnListByTagId(tag_id = tagId).executeAsList()
+    }
+
+    suspend fun getTxnById(id: Long) = withContext(Dispatchers.IO) {
+        return@withContext tq.getTxnById(id).executeAsOneOrNull()
     }
 }

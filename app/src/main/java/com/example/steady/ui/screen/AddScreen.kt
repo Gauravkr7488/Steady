@@ -85,12 +85,20 @@ fun AddScreen(
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     var spentFlag by remember { mutableStateOf(false) }
+    var id by remember { mutableLongStateOf(-1) }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
         keyboardController?.show()
         allTags = sharedViewModel.getAllTags()
         spentFlag = sharedViewModel.spentFlag
+        id = sharedViewModel.id
+        if (id != -1L) {
+            val currentTxn = sharedViewModel.getTxnById(id) ?: return@LaunchedEffect
+            title = currentTxn.title
+            amount = currentTxn.amount
+            txnTagList = sharedViewModel.getTags(id)
+        }
     }
 
     Scaffold(
@@ -100,7 +108,7 @@ fun AddScreen(
                 onClick = {
                     coroutineScope.launch {
                         val txn = Txn(
-                            id = 0,
+                            id = id,
                             title = title,
                             amount = if (spentFlag) -amount else amount,
                             createdAt = System.currentTimeMillis()
