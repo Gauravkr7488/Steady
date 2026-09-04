@@ -81,6 +81,7 @@ fun AddScreen(
     var title by remember { mutableStateOf("") }
     var amount by remember { mutableLongStateOf(0) }
     var txnTagList by remember { mutableStateOf(emptyList<Tag>()) }
+    var tagsToAdd by remember { mutableStateOf(emptyList<Tag>()) }
     var allTags by remember { mutableStateOf(emptyList<Tag>()) }
     var newTags by remember { mutableStateOf(emptyList<Tag>()) }
     val coroutineScope = rememberCoroutineScope()
@@ -116,14 +117,16 @@ fun AddScreen(
                             createdAt = System.currentTimeMillis()
                         )
                         val txnId = sharedViewModel.save(txn)
-                        txnTagList.forEach {
+                        sharedViewModel.removeAllTagFromTxn(txn.id)
+                        tagsToAdd += txnTagList
+                        tagsToAdd.toSet().forEach {
                             var tagId = it.id
                             if (tagId == 0L) tagId = sharedViewModel.saveTag(it.name)
                             sharedViewModel.addTag(tagId, txnId)
                         }
-                        newTags.forEach {
-                            if (!txnTagList.contains(it)) sharedViewModel.saveTag(it.name)
-                        }
+//                        newTags.forEach {
+//                            if (!txnTagList.contains(it)) sharedViewModel.saveTag(it.name)
+//                        }
                         navController.navigate(
                             Routes.HOME,
                             navOptions = navOptions {
@@ -191,12 +194,13 @@ fun AddScreen(
             )
             TagMenu(
                 txnTags = txnTagList,
-                availableTagList = allTags + newTags,
-                onAdd = { txnTagList = it },
+                availableTagList = allTags + newTags - txnTagList.toSet(),
+                onAdd = { tagsToAdd = it },
                 onCreateNew = {
-                    newTags += Tag(0, it)
+                    tagsToAdd += Tag(0, it)
                 },
-                allTags = allTags + newTags
+                allTags = allTags + newTags,
+                onRemove = { txnTagList -= it }
             )
         }
     }
@@ -209,6 +213,7 @@ fun TagMenu(
     availableTagList: List<Tag>,
     allTags: List<Tag>,
     onAdd: (List<Tag>) -> Unit,
+    onRemove: (Tag) -> Unit,
     onCreateNew: (String) -> Unit
 ) {
     var showViewDialog by remember { mutableStateOf(false) }
@@ -245,7 +250,7 @@ fun TagMenu(
             ) {
                 items(
                     items = txnTags
-                ) {
+                ) { tag ->
                     Card(
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(
@@ -259,15 +264,15 @@ fun TagMenu(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Text(it.name)
+                            Text(tag.name)
                             Spacer(Modifier.weight(1f))
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "Close",
                                 modifier = Modifier.pointerInput(Unit) {
                                     detectTapGestures(onTap = {
-                                    }
-                                    )
+                                        onRemove(tag)
+                                    })
                                 }
                             )
                         }

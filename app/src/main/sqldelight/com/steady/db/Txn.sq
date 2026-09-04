@@ -64,3 +64,7 @@ WHERE TxnTag.tag_id = ?;
 getTxnById:
 SELECT * FROM Txn
 WHERE id = ?;
+
+removeAllTagFromTxn:
+DELETE FROM TxnTag
+WHERE txn_id = ?;

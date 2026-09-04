@@ -14,8 +14,13 @@ class SharedViewModel(
     private val dbOperation: DbOperation
 ) : ViewModel() {
     suspend fun save(txn: Txn): Long {
-        if (txn.id != -1L) dbOperation.updateTxn(txn) else dbOperation.insertTxn(txn)
-        return dbOperation.getLastRowInsertId()
+        if (txn.id == -1L) {
+            dbOperation.insertTxn(txn)
+            return dbOperation.getLastRowInsertId()
+        } else {
+            dbOperation.updateTxn(txn)
+            return txn.id
+        }
     }
 
     suspend fun getAllTxns(): List<Txn> {
@@ -30,6 +35,10 @@ class SharedViewModel(
         viewModelScope.launch {
             dbOperation.addTag(tagId, txnId)
         }
+    }
+
+    suspend fun removeAllTagFromTxn(txnId: Long) {
+        dbOperation.removeAllTagFromTxn(txnId)
     }
 
     suspend fun saveTag(name: String): Long {
