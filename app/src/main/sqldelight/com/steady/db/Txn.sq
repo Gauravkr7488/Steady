@@ -68,3 +68,7 @@ WHERE id = ?;
 removeAllTagFromTxn:
 DELETE FROM TxnTag
 WHERE txn_id = ?;
+
+delteTxn:
+DELETE FROM Txn
+WHERE id = ?;

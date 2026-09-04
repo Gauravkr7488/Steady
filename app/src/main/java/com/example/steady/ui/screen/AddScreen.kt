@@ -35,6 +35,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -88,62 +89,85 @@ fun AddScreen(
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     var spentFlag by remember { mutableStateOf(false) }
-    var id by remember { mutableLongStateOf(-1) }
+    var txnId by remember { mutableLongStateOf(-1) }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
         keyboardController?.show()
         allTags = sharedViewModel.getAllTags()
         spentFlag = sharedViewModel.spentFlag
-        id = sharedViewModel.id
-        if (id != -1L) {
-            val currentTxn = sharedViewModel.getTxnById(id) ?: return@LaunchedEffect
+        txnId = sharedViewModel.id
+        if (txnId != -1L) {
+            val currentTxn = sharedViewModel.getTxnById(txnId) ?: return@LaunchedEffect
             title = currentTxn.title
             amount = currentTxn.amount
-            txnTagList = sharedViewModel.getTags(id)
+            txnTagList = sharedViewModel.getTags(txnId)
         }
     }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    coroutineScope.launch {
-                        val txn = Txn(
-                            id = id,
-                            title = title,
-                            amount = if (spentFlag) -amount else amount,
-                            createdAt = System.currentTimeMillis()
-                        )
-                        val txnId = sharedViewModel.save(txn)
-                        sharedViewModel.removeAllTagFromTxn(txn.id)
-                        tagsToAdd += txnTagList
-                        tagsToAdd.toSet().forEach {
-                            var tagId = it.id
-                            if (tagId == 0L) tagId = sharedViewModel.saveTag(it.name)
-                            sharedViewModel.addTag(tagId, txnId)
-                        }
-//                        newTags.forEach {
-//                            if (!txnTagList.contains(it)) sharedViewModel.saveTag(it.name)
-//                        }
-                        navController.navigate(
-                            Routes.HOME,
-                            navOptions = navOptions {
-                                popUpTo(Routes.HOME) { inclusive = true }
-                                launchSingleTop = true
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                if (txnId != -1L){
+                    FloatingActionButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                sharedViewModel.deleteTxn(txnId)
+                                navController.navigate(
+                                    Routes.HOME,
+                                    navOptions = navOptions {
+                                        popUpTo(Routes.HOME) { inclusive = true }
+                                        launchSingleTop = true
+                                    }
+                                )
                             }
+                        },
+                        modifier = Modifier.size(80.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete"
                         )
                     }
-                },
-                modifier = Modifier.size(80.dp)
+                }
 
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Save,
-                    contentDescription = "Save"
-                )
+                FloatingActionButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            val txn = Txn(
+                                id = txnId,
+                                title = title,
+                                amount = if (spentFlag) -amount else amount,
+                                createdAt = System.currentTimeMillis()
+                            )
+                            val txnId = sharedViewModel.save(txn)
+                            sharedViewModel.removeAllTagFromTxn(txn.id)
+                            tagsToAdd += txnTagList
+                            tagsToAdd.toSet().forEach {
+                                var tagId = it.id
+                                if (tagId == 0L) tagId = sharedViewModel.saveTag(it.name)
+                                sharedViewModel.addTag(tagId, txnId)
+                            }
+                            navController.navigate(
+                                Routes.HOME,
+                                navOptions = navOptions {
+                                    popUpTo(Routes.HOME) { inclusive = true }
+                                    launchSingleTop = true
+                                }
+                            )
+                        }
+                    },
+                    modifier = Modifier.size(80.dp)
+
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Save,
+                        contentDescription = "Save"
+                    )
+                }
             }
+
         }
 
     ) { innerPadding ->

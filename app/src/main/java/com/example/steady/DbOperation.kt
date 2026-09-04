@@ -81,4 +81,8 @@ class DbOperation(
     suspend fun removeAllTagFromTxn(txnId: Long) = withContext(Dispatchers.IO) {
         return@withContext tq.removeAllTagFromTxn(txnId)
     }
+
+    suspend fun deleteTxn(txnId: Long) = withContext(Dispatchers.IO) {
+        return@withContext tq.delteTxn(txnId)
+    }
 }
