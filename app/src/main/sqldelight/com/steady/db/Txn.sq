@@ -18,7 +18,7 @@ CREATE TABLE TxnTag (
     FOREIGN KEY (tag_id) REFERENCES Tag(id) ON DELETE CASCADE
 );
 
-insert:
+insertTxn:
 INSERT INTO Txn(
     title,
     amount,
@@ -29,6 +29,12 @@ VALUES (
 ?,
 ?
 );
+
+updateTxn:
+UPDATE Txn SET
+    title = ?,
+    amount = ?
+WHERE id = ?;
 
 getAll:
 SELECT * FROM Txn;
@@ -54,3 +60,11 @@ getTxnListByTagId:
 SELECT Txn.* FROM Txn
 JOIN TxnTag ON Txn.id = TxnTag.txn_id
 WHERE TxnTag.tag_id = ?;
+
+getTxnById:
+SELECT * FROM Txn
+WHERE id = ?;
+
+removeAllTagFromTxn:
+DELETE FROM TxnTag
+WHERE txn_id = ?;

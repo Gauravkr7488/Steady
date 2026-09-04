@@ -23,6 +23,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -33,6 +34,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -79,18 +81,27 @@ fun AddScreen(
     var title by remember { mutableStateOf("") }
     var amount by remember { mutableLongStateOf(0) }
     var txnTagList by remember { mutableStateOf(emptyList<Tag>()) }
+    var tagsToAdd by remember { mutableStateOf(emptyList<Tag>()) }
     var allTags by remember { mutableStateOf(emptyList<Tag>()) }
     var newTags by remember { mutableStateOf(emptyList<Tag>()) }
     val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     var spentFlag by remember { mutableStateOf(false) }
+    var id by remember { mutableLongStateOf(-1) }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
         keyboardController?.show()
         allTags = sharedViewModel.getAllTags()
         spentFlag = sharedViewModel.spentFlag
+        id = sharedViewModel.id
+        if (id != -1L) {
+            val currentTxn = sharedViewModel.getTxnById(id) ?: return@LaunchedEffect
+            title = currentTxn.title
+            amount = currentTxn.amount
+            txnTagList = sharedViewModel.getTags(id)
+        }
     }
 
     Scaffold(
@@ -100,20 +111,22 @@ fun AddScreen(
                 onClick = {
                     coroutineScope.launch {
                         val txn = Txn(
-                            id = 0,
+                            id = id,
                             title = title,
                             amount = if (spentFlag) -amount else amount,
                             createdAt = System.currentTimeMillis()
                         )
                         val txnId = sharedViewModel.save(txn)
-                        txnTagList.forEach {
+                        sharedViewModel.removeAllTagFromTxn(txn.id)
+                        tagsToAdd += txnTagList
+                        tagsToAdd.toSet().forEach {
                             var tagId = it.id
                             if (tagId == 0L) tagId = sharedViewModel.saveTag(it.name)
                             sharedViewModel.addTag(tagId, txnId)
                         }
-                        newTags.forEach {
-                            if (!txnTagList.contains(it)) sharedViewModel.saveTag(it.name)
-                        }
+//                        newTags.forEach {
+//                            if (!txnTagList.contains(it)) sharedViewModel.saveTag(it.name)
+//                        }
                         navController.navigate(
                             Routes.HOME,
                             navOptions = navOptions {
@@ -181,12 +194,13 @@ fun AddScreen(
             )
             TagMenu(
                 txnTags = txnTagList,
-                availableTagList = allTags + newTags,
-                onAdd = { txnTagList = it },
+                availableTagList = allTags + newTags - txnTagList.toSet(),
+                onAdd = { tagsToAdd = it },
                 onCreateNew = {
-                    newTags += Tag(0, it)
+                    tagsToAdd += Tag(0, it)
                 },
-                allTags = allTags + newTags
+                allTags = allTags + newTags,
+                onRemove = { txnTagList -= it }
             )
         }
     }
@@ -199,6 +213,7 @@ fun TagMenu(
     availableTagList: List<Tag>,
     allTags: List<Tag>,
     onAdd: (List<Tag>) -> Unit,
+    onRemove: (Tag) -> Unit,
     onCreateNew: (String) -> Unit
 ) {
     var showViewDialog by remember { mutableStateOf(false) }
@@ -235,8 +250,33 @@ fun TagMenu(
             ) {
                 items(
                     items = txnTags
-                ) {
-                    Row { Text(it.name) }
+                ) { tag ->
+                    Card(
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(tag.name)
+                            Spacer(Modifier.weight(1f))
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close",
+                                modifier = Modifier.pointerInput(Unit) {
+                                    detectTapGestures(onTap = {
+                                        onRemove(tag)
+                                    })
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }

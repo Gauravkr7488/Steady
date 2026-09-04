@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Upload
@@ -140,7 +139,10 @@ fun HomeScreen(
                         )
                     }
                     items(txnData, key = { it.first.id }) {
-                        TxnCard(it.first, it.second)
+                        TxnCard(it.first, it.second, onClick = {
+                            sharedViewModel.id = it.first.id
+                            navController.navigate(Routes.ADD)
+                        })
                     }
                 }
             }

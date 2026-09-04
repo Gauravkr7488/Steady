@@ -1,6 +1,7 @@
 package com.example.steady
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -13,18 +14,31 @@ class SharedViewModel(
     private val dbOperation: DbOperation
 ) : ViewModel() {
     suspend fun save(txn: Txn): Long {
-        dbOperation.saveNewTxn(txn)
-        return dbOperation.getLastRowInsertId()
+        if (txn.id == -1L) {
+            dbOperation.insertTxn(txn)
+            return dbOperation.getLastRowInsertId()
+        } else {
+            dbOperation.updateTxn(txn)
+            return txn.id
+        }
     }
 
     suspend fun getAllTxns(): List<Txn> {
         return dbOperation.getAll()
     }
 
+    suspend fun getTxnById(id: Long): Txn? {
+        return dbOperation.getTxnById(id)
+    }
+
     fun addTag(tagId: Long, txnId: Long) {
         viewModelScope.launch {
             dbOperation.addTag(tagId, txnId)
         }
+    }
+
+    suspend fun removeAllTagFromTxn(txnId: Long) {
+        dbOperation.removeAllTagFromTxn(txnId)
     }
 
     suspend fun saveTag(name: String): Long {
@@ -50,5 +64,17 @@ class SharedViewModel(
         }
         set(value) {
             _spentFlag = value
+        }
+
+    private var _id: Long by mutableLongStateOf(-1)
+
+    var id: Long
+        get() {
+            val value = _id
+            _id = -1
+            return value
+        }
+        set(value) {
+            _id = value
         }
 }
