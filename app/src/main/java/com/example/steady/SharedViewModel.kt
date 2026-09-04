@@ -31,6 +31,10 @@ class SharedViewModel(
         return dbOperation.getTxnById(id)
     }
 
+    suspend fun deleteTxn(txnId: Long){
+        dbOperation.deleteTxn(txnId)
+    }
+
     fun addTag(tagId: Long, txnId: Long) {
         viewModelScope.launch {
             dbOperation.addTag(tagId, txnId)
