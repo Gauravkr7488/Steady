@@ -71,4 +71,10 @@ object Utils {
             set(Calendar.MILLISECOND, 0)
         }.timeInMillis
     }
+
+    fun getAutoBackupTime(): Long {
+        val c = Calendar.getInstance()
+        c.add(Calendar.HOUR_OF_DAY, 1)
+        return c.timeInMillis
+    }
 }

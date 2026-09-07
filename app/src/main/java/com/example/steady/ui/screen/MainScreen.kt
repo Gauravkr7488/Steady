@@ -17,15 +17,19 @@
 package com.example.steady.ui.screen
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.steady.BackupService
 import com.example.steady.DbOperation
 import com.example.steady.SharedViewModel
+import com.example.steady.WorkService
 import com.example.steady.constant.Routes
+import com.example.steady.viewmodel.BackupViewModel
 import com.example.steady.viewmodel.TagViewModel
 
 @Composable
@@ -42,6 +46,22 @@ fun MainScreen(dbOperation: DbOperation) {
         factory = viewModelFactory {
             initializer {
                 TagViewModel(dbOperation)
+            }
+        }
+    )
+    val context = LocalContext.current
+    val backupService = BackupService(
+        dbOperation,
+        context = context
+    )
+    val workService = WorkService(context)
+    val backupViewModel = viewModel<BackupViewModel>(
+        factory = viewModelFactory {
+            initializer {
+                BackupViewModel(
+                    backupService = backupService,
+                    workService = workService
+                )
             }
         }
     )
@@ -62,6 +82,9 @@ fun MainScreen(dbOperation: DbOperation) {
         }
         composable(Routes.TAG) {
             TagScreen(navController, tagViewModel)
+        }
+        composable(Routes.BACKUP) {
+            BackupScreen(backupViewModel)
         }
     }
 }
