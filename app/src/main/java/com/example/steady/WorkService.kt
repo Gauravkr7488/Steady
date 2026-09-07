@@ -24,6 +24,6 @@ class WorkService(private val context: Context) {
     }
 
     fun cancelAllWorkByAction(action: String) {
-        WorkManager.getInstance(context).cancelAllWorkByTag("tidy-$action")
+        WorkManager.getInstance(context).cancelAllWorkByTag("steady-$action")
     }
 }

@@ -17,7 +17,6 @@
 package com.example.steady
 
 import com.steady.db.Tag
-import com.steady.db.Txn
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -27,15 +26,6 @@ import java.util.TimeZone
 object Utils {
     fun getEmptyTag(): Tag {
         return Tag(0, "")
-    }
-
-    fun getEmptyTxn(): Txn {
-        return Txn(
-            id = 0,
-            title = "",
-            amount = 0,
-            createdAt = System.currentTimeMillis()
-        )
     }
 
     fun changeDateFormat(date: Long, pattern: String): String {
