@@ -24,7 +24,7 @@ class SharedViewModel(
     }
 
     suspend fun getAllTxns(): List<Txn> {
-        return dbOperation.getAll()
+        return dbOperation.getAllTxn()
     }
 
     suspend fun getTxnById(id: Long): Txn? {

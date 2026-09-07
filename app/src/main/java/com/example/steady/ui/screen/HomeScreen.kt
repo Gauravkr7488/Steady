@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Upload
@@ -62,6 +63,17 @@ fun HomeScreen(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                FloatingActionButton(
+                    onClick = { navController.navigate(Routes.BACKUP) },
+                    modifier = Modifier.size(80.dp)
+
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Cloud,
+                        contentDescription = "Backup"
+                    )
+                }
+
                 FloatingActionButton(
                     onClick = { navController.navigate(Routes.TAG_LIST) },
                     modifier = Modifier.size(80.dp)

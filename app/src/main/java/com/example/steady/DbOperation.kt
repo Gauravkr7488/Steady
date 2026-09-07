@@ -17,12 +17,14 @@
 package com.example.steady
 
 import com.steady.db.AppDatabase
+import com.steady.db.Tag
 import com.steady.db.Txn
+import com.steady.db.TxnTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class DbOperation(
-    db: AppDatabase
+    private val db: AppDatabase
 ) {
     private val tq = db.txnQueries
 
@@ -42,9 +44,56 @@ class DbOperation(
         )
     }
 
-    suspend fun getAll() = withContext(Dispatchers.IO) {
-        tq.getAll().executeAsList()
+    suspend fun getAllTxn() = withContext(Dispatchers.IO) {
+        tq.getAllTxn().executeAsList()
     }
+
+    suspend fun getAllTxnTag() = withContext(Dispatchers.IO) {
+        tq.getAllTxnTag().executeAsList()
+    }
+
+    suspend fun deleteEveryThing() = withContext(Dispatchers.IO) {
+        tq.deleteAllTag()
+        tq.deleteAllTxn()
+        tq.deleteAllTxnTag()
+    }
+
+    suspend fun saveTasksWithId(txns: List<Txn>) = withContext(Dispatchers.IO) {
+        db.transaction {
+            txns.forEach {
+                tq.insertTxnWithId(
+                    id = it.id,
+                    title = it.title,
+                    amount = it.amount,
+                    createdAt = it.createdAt
+                )
+            }
+        }
+    }
+
+    suspend fun saveTagsWithId(tags: List<Tag>) = withContext(Dispatchers.IO) {
+        db.transaction {
+            tags.forEach {
+                tq.insertTagWithId(
+                    id = it.id,
+                    name = it.name,
+                )
+            }
+        }
+    }
+
+
+    suspend fun saveTxnTags(txnTags: List<TxnTag>) = withContext(Dispatchers.IO) {
+        db.transaction {
+            txnTags.forEach {
+                tq.addTag(
+                    txn_id = it.txn_id,
+                    tag_id = it.tag_id
+                )
+            }
+        }
+    }
+
 
     suspend fun addTag(tagId: Long, txnId: Long) = withContext(Dispatchers.IO) {
         tq.addTag(
@@ -54,7 +103,7 @@ class DbOperation(
     }
 
     suspend fun saveTag(name: String) = withContext(Dispatchers.IO) {
-        tq.createNewTag(name)
+        tq.insertTag(name)
         return@withContext tq.getLastRowInsertId().executeAsOne()
     }
 

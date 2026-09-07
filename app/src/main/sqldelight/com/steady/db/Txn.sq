@@ -29,6 +29,19 @@ VALUES (
 ?,
 ?
 );
+insertTxnWithId:
+INSERT INTO Txn(
+    id,
+    title,
+    amount,
+    createdAt
+)
+VALUES (
+?,
+?,
+?,
+?
+);
 
 updateTxn:
 UPDATE Txn SET
@@ -36,11 +49,23 @@ UPDATE Txn SET
     amount = ?
 WHERE id = ?;
 
-getAll:
+getAllTxn:
 SELECT * FROM Txn;
 
-createNewTag:
+getAllTxnTag:
+SELECT * FROM TxnTag;
+
+insertTag:
 INSERT INTO Tag(name) VALUES (?);
+
+insertTagWithId:
+INSERT INTO Tag(
+    id,
+    name
+) VALUES (
+    ?,
+    ?
+);
 
 addTag:
 INSERT INTO TxnTag(txn_id, tag_id) VALUES (?,?);
@@ -72,3 +97,12 @@ WHERE txn_id = ?;
 delteTxn:
 DELETE FROM Txn
 WHERE id = ?;
+
+deleteAllTxn:
+DELETE FROM Txn;
+
+deleteAllTag:
+DELETE FROM Tag;
+
+deleteAllTxnTag:
+DELETE FROM TxnTag;
