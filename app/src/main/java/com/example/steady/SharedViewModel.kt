@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 class SharedViewModel(
     private val dbOperation: DbOperation
 ) : ViewModel() {
-    suspend fun save(txn: Txn): Long {
+    suspend fun saveTxn(txn: Txn): Long {
         if (txn.id == -1L) {
             dbOperation.insertTxn(txn)
             return dbOperation.getLastRowInsertId()

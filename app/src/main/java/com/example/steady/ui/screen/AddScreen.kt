@@ -36,6 +36,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.RemoveDone
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -89,6 +91,7 @@ fun AddScreen(
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     var spentFlag by remember { mutableStateOf(false) }
+    var suspendedStatus by remember { mutableStateOf(false) }
     var txnId by remember { mutableLongStateOf(-1) }
 
     LaunchedEffect(Unit) {
@@ -99,6 +102,7 @@ fun AddScreen(
             val currentTxn = sharedViewModel.getTxnById(txnId) ?: return@LaunchedEffect
             title = currentTxn.title
             amount = currentTxn.amount
+            suspendedStatus = currentTxn.suspendedStatus
             txnTagList = sharedViewModel.getTags(txnId)
         } else {
             focusRequester.requestFocus()
@@ -131,6 +135,24 @@ fun AddScreen(
                             contentDescription = "Delete"
                         )
                     }
+                    FloatingActionButton(
+                        onClick = {
+                            suspendedStatus = !suspendedStatus
+                        },
+                        modifier = Modifier.size(80.dp)
+                    ) {
+                        if (!suspendedStatus) {
+                            Icon(
+                                imageVector = Icons.Default.DoneAll,
+                                contentDescription = "Suspend"
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.RemoveDone,
+                                contentDescription = "Remove Suspend"
+                            )
+                        }
+                    }
                 }
 
                 FloatingActionButton(
@@ -140,9 +162,10 @@ fun AddScreen(
                                 id = txnId,
                                 title = title,
                                 amount = if (spentFlag) -amount else amount,
+                                suspendedStatus = suspendedStatus,
                                 createdAt = System.currentTimeMillis()
                             )
-                            val txnId = sharedViewModel.save(txn)
+                            val txnId = sharedViewModel.saveTxn(txn)
                             sharedViewModel.removeAllTagFromTxn(txn.id)
                             tagsToAdd += txnTagList
                             tagsToAdd.toSet().forEach {
