@@ -31,25 +31,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.steady.Utils
 import com.example.steady.ui.component.card.TxnCard
 import com.example.steady.viewmodel.TagViewModel
 import com.steady.db.Tag
 import com.steady.db.Txn
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 @Composable
 fun TagScreen(
-    navController: NavController,
     tagViewModel: TagViewModel
 
 ) {
@@ -74,7 +69,7 @@ fun TagScreen(
                 modifier = Modifier.padding(8.dp)
             ) {
                 var total = 0L
-                txnList.forEach { total += it.amount }
+                txnList.forEach { if (!it.suspendedStatus) total += it.amount }
                 Text("Total")
                 Spacer(Modifier.weight(1f))
                 Text(total.toString(), style = MaterialTheme.typography.displayMedium)

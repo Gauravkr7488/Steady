@@ -45,7 +45,7 @@ fun TxnCard(
 ) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = if (!txn.suspendedStatus)MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant
         ),
         shape = RoundedCornerShape(12.dp),
         onClick = onClick
