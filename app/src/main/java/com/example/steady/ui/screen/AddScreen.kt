@@ -92,8 +92,6 @@ fun AddScreen(
     var txnId by remember { mutableLongStateOf(-1) }
 
     LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-        keyboardController?.show()
         allTags = sharedViewModel.getAllTags()
         spentFlag = sharedViewModel.spentFlag
         txnId = sharedViewModel.id
@@ -102,6 +100,9 @@ fun AddScreen(
             title = currentTxn.title
             amount = currentTxn.amount
             txnTagList = sharedViewModel.getTags(txnId)
+        } else {
+            focusRequester.requestFocus()
+            keyboardController?.show()
         }
     }
 
@@ -109,7 +110,7 @@ fun AddScreen(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                if (txnId != -1L){
+                if (txnId != -1L) {
                     FloatingActionButton(
                         onClick = {
                             coroutineScope.launch {
