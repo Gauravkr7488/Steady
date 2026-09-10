@@ -81,7 +81,7 @@ fun MainScreen(dbOperation: DbOperation) {
             TagListScreen(navController, tagViewModel)
         }
         composable(Routes.TAG) {
-            TagScreen(navController, tagViewModel)
+            TagScreen(tagViewModel)
         }
         composable(Routes.BACKUP) {
             BackupScreen(backupViewModel)

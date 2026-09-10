@@ -32,6 +32,7 @@ class DbOperation(
         tq.insertTxn(
             title = txn.title,
             amount = txn.amount,
+            suspendedStatus = txn.suspendedStatus,
             createdAt = txn.createdAt
         )
     }
@@ -40,6 +41,7 @@ class DbOperation(
         tq.updateTxn(
             title = txn.title,
             amount = txn.amount,
+            suspendedStatus = txn.suspendedStatus,
             id = txn.id,
         )
     }
@@ -65,6 +67,7 @@ class DbOperation(
                     id = it.id,
                     title = it.title,
                     amount = it.amount,
+                    suspendedStatus = it.suspendedStatus,
                     createdAt = it.createdAt
                 )
             }

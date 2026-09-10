@@ -129,7 +129,7 @@ fun HomeScreen(
                 modifier = Modifier.padding(8.dp)
             ) {
                 var total = 0L
-                txnList.forEach { total += it.amount }
+                txnList.forEach { if (!it.suspendedStatus) total += it.amount }
                 Text("Balance")
                 Spacer(Modifier.weight(1f))
                 Text(total.toString(), style = MaterialTheme.typography.displayMedium)

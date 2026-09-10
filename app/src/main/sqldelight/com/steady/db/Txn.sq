@@ -1,7 +1,27 @@
-CREATE TABLE Txn (
+import kotlin.Boolean;
+
+-- /*
+--  * Copyright (C) 2026  Gaurav Kumar
+--  *
+--  * This program is free software: you can redistribute it and/or modify
+--  * it under the terms of the GNU General Public License as published by
+--  * the Free Software Foundation, either version 3 of the License, or
+--  * (at your option) any later version.
+--  *
+--  * This program is distributed in the hope that it will be useful,
+--  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+--  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+--  * GNU General Public License for more details.
+--  *
+--  * You should have received a copy of the GNU General Public License
+--  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+--  */
+
+ CREATE TABLE Txn (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     amount INTEGER NOT NULL,
+    suspendedStatus INTEGER AS Boolean NOT NULL DEFAULT 0,
     createdAt INTEGER NOT NULL
 );
 
@@ -22,9 +42,11 @@ insertTxn:
 INSERT INTO Txn(
     title,
     amount,
+    suspendedStatus,
     createdAt
 )
 VALUES (
+?,
 ?,
 ?,
 ?
@@ -34,9 +56,11 @@ INSERT INTO Txn(
     id,
     title,
     amount,
+    suspendedStatus,
     createdAt
 )
 VALUES (
+?,
 ?,
 ?,
 ?,
@@ -46,7 +70,8 @@ VALUES (
 updateTxn:
 UPDATE Txn SET
     title = ?,
-    amount = ?
+    amount = ?,
+    suspendedStatus = ?
 WHERE id = ?;
 
 getAllTxn:
