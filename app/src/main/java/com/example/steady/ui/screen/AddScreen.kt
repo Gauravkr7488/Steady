@@ -241,9 +241,9 @@ fun AddScreen(
 
             )
             TagMenu(
-                txnTags = txnTagList,
+                txnTags = txnTagList + tagsToAdd,
                 availableTagList = allTags + newTags - txnTagList.toSet(),
-                onAdd = { tagsToAdd = it },
+                onAdd = { tagsToAdd += it },
                 onCreateNew = {
                     tagsToAdd += Tag(0, it)
                 },
