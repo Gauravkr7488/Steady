@@ -242,10 +242,10 @@ fun AddScreen(
             )
             TagMenu(
                 txnTags = txnTagList + tagsToAdd,
-                availableTagList = allTags + newTags - txnTagList.toSet(),
+                availableTagList = allTags + newTags - txnTagList.toSet() - tagsToAdd.toSet(),
                 onAdd = { tagsToAdd += it },
                 onCreateNew = {
-                    tagsToAdd += Tag(0, it)
+                    tagsToAdd += Tag(0, it.trim())
                 },
                 allTags = allTags + newTags,
                 onRemove = { txnTagList -= it }
@@ -339,7 +339,7 @@ fun TagMenu(
             keyboardController?.show()
         }
         val isInvalid = allTags.any {
-            it.name == text
+            it.name == text.trim()
         }
         TidyDialog(
             title = "Create New Tag",
@@ -367,6 +367,7 @@ fun TagMenu(
                 value = text,
                 onValueChange = { text = it },
                 isError = isInvalid,
+                singleLine = true,
                 modifier = Modifier
                     .focusRequester(focusRequester)
             )
