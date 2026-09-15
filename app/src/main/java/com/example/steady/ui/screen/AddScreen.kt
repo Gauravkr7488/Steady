@@ -160,7 +160,7 @@ fun AddScreen(
                         coroutineScope.launch {
                             val txn = Txn(
                                 id = txnId,
-                                title = title,
+                                title = title.ifEmpty { "No Title" },
                                 amount = if (spentFlag) -amount else amount,
                                 suspendedStatus = suspendedStatus,
                                 createdAt = System.currentTimeMillis()
