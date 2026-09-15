@@ -9,6 +9,8 @@ import com.example.steady.DbOperation
 import com.example.steady.Utils
 import com.steady.db.Tag
 import com.steady.db.Txn
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class TagViewModel(
@@ -31,13 +33,16 @@ class TagViewModel(
         return dbOperation.getTxnListByTagId(tagId)
     }
 
-    suspend fun getTagList(): List<Tag> {
-        return dbOperation.getAllTags()
-    }
-
     fun saveTag(name: String) {
         viewModelScope.launch {
             dbOperation.saveTag(name = name)
         }
     }
+
+    val tags = dbOperation.observeTags()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList()
+        )
 }
