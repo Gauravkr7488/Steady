@@ -16,11 +16,14 @@
  */
 package com.example.steady
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import com.steady.db.AppDatabase
 import com.steady.db.Tag
 import com.steady.db.Txn
 import com.steady.db.TxnTag
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 class DbOperation(
@@ -137,4 +140,10 @@ class DbOperation(
     suspend fun deleteTxn(txnId: Long) = withContext(Dispatchers.IO) {
         return@withContext tq.delteTxn(txnId)
     }
+
+    fun observeTags(): Flow<List<Tag>> =
+        tq.getAllTags()
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+
 }

@@ -70,6 +70,7 @@ import androidx.navigation.navOptions
 import com.example.steady.SharedViewModel
 import com.example.steady.constant.Routes
 import com.example.steady.ui.component.button.RoundedOutlineButtonTidy
+import com.example.steady.ui.component.dialog.NewTagDialog
 import com.example.steady.ui.component.dialog.TidyDialog
 import com.example.steady.ui.component.menu.OutlinedMenuItem
 import com.steady.db.Tag
@@ -330,47 +331,11 @@ fun TagMenu(
         }
     }
     if (showCrateNewDialog) {
-        val focusRequester = remember { FocusRequester() }
-        val keyboardController = LocalSoftwareKeyboardController.current
-
-        var text by remember { mutableStateOf("") }
-        LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
-            keyboardController?.show()
-        }
-        val isInvalid = allTags.any {
-            it.name == text.trim()
-        }
-        TidyDialog(
-            title = "Create New Tag",
-            buttons = {
-                TextButton(onClick = {
-                    showCrateNewDialog = false
-                }) {
-                    Text("Cancel")
-                }
-
-                TextButton(onClick = {
-                    if (!isInvalid) {
-                        onCreateNew(text)
-                        showCrateNewDialog = false
-                    }
-                }) {
-                    Text("Create")
-                }
-            },
-            onDismissRequest = { showCrateNewDialog = false },
+        NewTagDialog(
+            allTags = allTags,
+            onCreateNew = { onCreateNew(it) }
         ) {
-            val labelText = if (isInvalid) "duplicate name" else "tag name"
-            OutlinedTextField(
-                label = { Text(labelText) },
-                value = text,
-                onValueChange = { text = it },
-                isError = isInvalid,
-                singleLine = true,
-                modifier = Modifier
-                    .focusRequester(focusRequester)
-            )
+            showCrateNewDialog = false
         }
     }
     if (showAddDialog) {
