@@ -27,9 +27,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -64,38 +62,6 @@ fun HomeScreen(
         floatingActionButton = {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 FloatingActionButton(
-                    onClick = { navController.navigate(Routes.BACKUP) },
-                    modifier = Modifier.size(80.dp)
-
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Cloud,
-                        contentDescription = "Backup"
-                    )
-                }
-
-                FloatingActionButton(
-                    onClick = { navController.navigate(Routes.TAG_LIST) },
-                    modifier = Modifier.size(80.dp)
-
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Tag,
-                        contentDescription = ""
-                    )
-                }
-
-                FloatingActionButton(
-                    onClick = { navController.navigate(Routes.ADD) },
-                    modifier = Modifier.size(80.dp)
-
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Download,
-                        contentDescription = "Received"
-                    )
-                }
-                FloatingActionButton(
                     onClick = {
                         sharedViewModel.spentFlag = true
                         navController.navigate(Routes.ADD)
@@ -106,6 +72,16 @@ fun HomeScreen(
                     Icon(
                         imageVector = Icons.Default.Upload,
                         contentDescription = "Spent"
+                    )
+                }
+                FloatingActionButton(
+                    onClick = { navController.navigate(Routes.ADD) },
+                    modifier = Modifier.size(80.dp)
+
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Download,
+                        contentDescription = "Received"
                     )
                 }
             }
