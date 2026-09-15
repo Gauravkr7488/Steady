@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("AssignedValueIsNeverRead")
+
 package com.example.steady.ui.screen
 
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -24,11 +26,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NewLabel
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,15 +44,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.steady.db.Tag
-import androidx.compose.runtime.setValue
 import com.example.steady.constant.Routes
+import com.example.steady.ui.component.dialog.NewTagDialog
 import com.example.steady.viewmodel.TagViewModel
+import com.steady.db.Tag
 
 
 @Composable
@@ -54,12 +62,24 @@ fun TagListScreen(
     tagViewModel: TagViewModel
 ) {
     var tagList: List<Tag> by remember { mutableStateOf(listOf()) }
+    var showCrateNewDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         tagList = tagViewModel.getTagList()
     }
 
     Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showCrateNewDialog = true },
+                modifier = Modifier.size(80.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.NewLabel,
+                    contentDescription = "Create new tag"
+                )
+            }
+        },
         modifier = Modifier.fillMaxSize()
     )
     { innerPadding ->
@@ -81,6 +101,14 @@ fun TagListScreen(
                             navController.navigate(Routes.TAG)
                         }
                     )
+                }
+            }
+            if (showCrateNewDialog) {
+                NewTagDialog(
+                    allTags = tagList,
+                    onCreateNew = { tagViewModel.saveTag(it) }
+                ) {
+                    showCrateNewDialog = false
                 }
             }
         }

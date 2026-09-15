@@ -51,7 +51,6 @@ class SharedViewModel(
 
     suspend fun getAllTags(): List<Tag> {
         return dbOperation.getAllTags()
-
     }
 
     suspend fun getTags(txnId: Long): List<Tag> {

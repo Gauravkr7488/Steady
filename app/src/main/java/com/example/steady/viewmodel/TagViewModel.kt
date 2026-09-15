@@ -4,10 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.steady.DbOperation
 import com.example.steady.Utils
 import com.steady.db.Tag
 import com.steady.db.Txn
+import kotlinx.coroutines.launch
 
 class TagViewModel(
     private val dbOperation: DbOperation
@@ -29,7 +31,13 @@ class TagViewModel(
         return dbOperation.getTxnListByTagId(tagId)
     }
 
-    suspend fun getTagList(): List<Tag>{
+    suspend fun getTagList(): List<Tag> {
         return dbOperation.getAllTags()
+    }
+
+    fun saveTag(name: String) {
+        viewModelScope.launch {
+            dbOperation.saveTag(name = name)
+        }
     }
 }
