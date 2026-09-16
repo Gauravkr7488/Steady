@@ -18,10 +18,10 @@ class SteadyWorker(
             TxnActions.BACKUP -> {
                 val backupService = BackupService(dbOperation, applicationContext)
                 backupService.exportSilently()
-                val workService = WorkService(applicationContext)
-                workService.scheduleWork(
+                val alarmService = AlarmService(applicationContext)
+                alarmService.scheduleAlarm(
                     scheduleTime = Utils.getAutoBackupTime(),
-                    action = action,
+                    action = action
                 )
                 Result.success()
             }

@@ -16,6 +16,18 @@
  */
 package com.example.steady
 
+import android.app.AlarmManager
+import android.content.Context
+import android.content.Context.ALARM_SERVICE
+import android.content.Intent
+import android.os.Build
+import android.provider.Settings
+import androidx.core.net.toUri
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.steady.db.Tag
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -66,5 +78,35 @@ object Utils {
         val c = Calendar.getInstance()
         c.add(Calendar.HOUR_OF_DAY, 1)
         return c.timeInMillis
+    }
+
+    fun scheduleImmediateWork(context: Context, action: String) {
+        val data = workDataOf( "action" to action)
+
+        val request = OneTimeWorkRequestBuilder<SteadyWorker>()
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .setInputData(data)
+            .addTag("steady-$action") // Tag for cancellation
+            .build()
+        WorkManager.getInstance(context).enqueue(request)
+    }
+
+    fun requestExactAlarmPermission(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
+            if (!alarmManager.canScheduleExactAlarms()) {
+                MaterialAlertDialogBuilder(context)
+                    .setTitle("Allow precise reminders")
+                    .setMessage("To make sure your alarms go off exactly on time, please allow this app to schedule exact alarms.")
+                    .setPositiveButton("Continue") { _, _ ->
+                        val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                            data = "package:${context.packageName}".toUri()
+                        }
+                        context.startActivity(intent)
+                    }
+                    .setNegativeButton("Not now", null)
+                    .show()
+            }
+        }
     }
 }

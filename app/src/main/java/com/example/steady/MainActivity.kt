@@ -19,5 +19,6 @@ class MainActivity : ComponentActivity() {
                 MainScreen(dbOperation)
             }
         }
+//        Utils.requestExactAlarmPermission(this)
     }
 }
