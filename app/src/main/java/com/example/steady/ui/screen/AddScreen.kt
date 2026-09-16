@@ -84,8 +84,7 @@ fun AddScreen(
 ) {
     var title by remember { mutableStateOf("") }
     var amount by remember { mutableLongStateOf(0) }
-    var txnTagList by remember { mutableStateOf(emptyList<Tag>()) }
-    var tagsToAdd by remember { mutableStateOf(emptyList<Tag>()) }
+    var tagsToAdd by remember { mutableStateOf(emptyList<Tag>()) } // cause with every save tags are being readded
     var allTags by remember { mutableStateOf(emptyList<Tag>()) }
     var newTags by remember { mutableStateOf(emptyList<Tag>()) }
     val coroutineScope = rememberCoroutineScope()
@@ -104,7 +103,7 @@ fun AddScreen(
             title = currentTxn.title
             amount = currentTxn.amount
             suspendedStatus = currentTxn.suspendedStatus
-            txnTagList = sharedViewModel.getTags(txnId)
+            tagsToAdd = sharedViewModel.getTags(txnId)
         } else {
             focusRequester.requestFocus()
             keyboardController?.show()
@@ -168,7 +167,6 @@ fun AddScreen(
                             )
                             val txnId = sharedViewModel.saveTxn(txn)
                             sharedViewModel.removeAllTagFromTxn(txn.id)
-                            tagsToAdd += txnTagList
                             tagsToAdd.toSet().forEach {
                                 var tagId = it.id
                                 if (tagId == 0L) tagId = sharedViewModel.saveTag(it.name)
@@ -242,14 +240,16 @@ fun AddScreen(
 
             )
             TagMenu(
-                txnTags = txnTagList + tagsToAdd,
-                availableTagList = allTags + newTags - txnTagList.toSet() - tagsToAdd.toSet(),
+                txnTags = tagsToAdd,
+                availableTagList = allTags + newTags - tagsToAdd.toSet(),
                 onAdd = { tagsToAdd += it },
                 onCreateNew = {
                     tagsToAdd += Tag(0, it.trim())
                 },
                 allTags = allTags + newTags,
-                onRemove = { txnTagList -= it }
+                onRemove = {
+                    tagsToAdd = tagsToAdd.minus(it)
+                }
             )
         }
     }
@@ -298,7 +298,7 @@ fun TagMenu(
                     .padding(bottom = 5.dp),
             ) {
                 items(
-                    items = txnTags
+                    items = txnTags, key = { it.name }
                 ) { tag ->
                     Card(
                         shape = RoundedCornerShape(12.dp),
