@@ -1,6 +1,9 @@
 package com.example.steady.ui.screen
 
+import android.app.AlarmManager
+import android.content.Context.ALARM_SERVICE
 import android.content.Intent
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.steady.Utils
 import com.example.steady.viewmodel.BackupViewModel
 
 
@@ -175,9 +179,16 @@ fun BackupScreen(
                                     .padding(8.dp)
                                     .size(48.dp),
                                 onClick = {
-                                    folderPickerLauncher.launch(null)
-                                    if (backupFolderName != null) {
-                                        backupViewModel.setAutoBackup()
+                                    Utils.requestExactAlarmPermission(context)
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                        val alarmManager =
+                                            context.getSystemService(ALARM_SERVICE) as AlarmManager
+                                        if (alarmManager.canScheduleExactAlarms()) {
+                                            folderPickerLauncher.launch(null)
+                                            if (backupFolderName != null) {
+                                                backupViewModel.setAutoBackup()
+                                            }
+                                        }
                                     }
                                 }
                             ) {

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Steady" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Steady" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+    <style name="Theme.MySplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/green_bird_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/green_bird</item>
+        <item name="postSplashScreenTheme">@style/Theme.Steady</item>
+    </style>
 </resources>

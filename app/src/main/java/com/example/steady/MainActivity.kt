@@ -4,12 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.steady.ui.screen.MainScreen
 import com.example.steady.ui.theme.SteadyTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         enableEdgeToEdge()
         val app = application as App
         val db = app.database
@@ -19,5 +21,6 @@ class MainActivity : ComponentActivity() {
                 MainScreen(dbOperation)
             }
         }
+        Utils.requestExactAlarmPermission(this)
     }
 }
