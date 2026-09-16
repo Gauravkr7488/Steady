@@ -365,7 +365,11 @@ fun TagMenu(
             }
         ) {
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 300.dp)
+                    .padding(bottom = 5.dp),
             ) {
                 items(availableTagList, key = { it.name }) { tag ->
                     val cardColor = CardDefaults.cardColors(
