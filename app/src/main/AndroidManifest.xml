@@ -15,11 +15,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/green_bird_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Steady">
+        android:theme="@style/Theme.MySplashScreen">
         <activity
             android:name="com.example.steady.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Steady">
+            android:theme="@style/Theme.MySplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
