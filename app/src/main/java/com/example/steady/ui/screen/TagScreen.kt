@@ -17,11 +17,13 @@
 package com.example.steady.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,6 +31,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -43,8 +47,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.steady.Utils
+import com.example.steady.ui.component.button.OutlinedDropDownButton
 import com.example.steady.ui.component.card.TxnCard
 import com.example.steady.ui.component.dialog.TidyDialog
 import com.example.steady.ui.component.menu.OutlinedMenuItem
@@ -60,6 +66,7 @@ fun TagScreen(
     var tag: Tag by remember { mutableStateOf(Tag(0, "")) }
     var txnList: List<Txn> by remember { mutableStateOf(listOf()) }
     var showFilterDialog by remember { mutableStateOf(false) }
+    var typeFilter by remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
         tag = tagViewModel.tag
         txnList = tagViewModel.getTxnList(tag.id)
@@ -134,7 +141,58 @@ fun TagScreen(
                         }
                     }
                 ) {
+                    val typeList = listOf(
+                        "All" to "ALL",
+                        "Received" to "RECEIVED",
+                        "Spent" to "SPENT"
+                    )
+                    FilterMenuItems(
+                        menuName = "Type",
+                        dropDownButtonLabel = if (typeFilter == "") "All" else typeList.first { it.second == typeFilter }.first ,
+                        menuItems = typeList
+                    ) {
+                        typeFilter = it
+                    }
+                }
+            }
+        }
+    }
+}
 
+@Composable
+private fun FilterMenuItems(
+    menuName: String,
+    dropDownButtonLabel: String,
+    menuItems: List<Pair<String, String>>,
+    onFilterChange: (String) -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = menuName,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(4.dp)
+        )
+        Box {
+            var showDropDownMenu by remember { mutableStateOf(false) }
+            OutlinedDropDownButton(
+                label = dropDownButtonLabel,
+                onClick = { showDropDownMenu = true },
+            )
+            DropdownMenu(
+                onDismissRequest = { showDropDownMenu = false },
+                expanded = showDropDownMenu
+            ) {
+                menuItems.forEach { (label, filter) ->
+                    DropdownMenuItem(
+                        text = { Text(label) },
+                        onClick = { onFilterChange(filter) }
+                    )
                 }
             }
         }
