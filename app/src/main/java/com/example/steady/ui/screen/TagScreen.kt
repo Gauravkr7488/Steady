@@ -34,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,6 +46,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.steady.Utils
 import com.example.steady.ui.component.card.TxnCard
+import com.example.steady.ui.component.dialog.TidyDialog
+import com.example.steady.ui.component.menu.OutlinedMenuItem
 import com.example.steady.viewmodel.TagViewModel
 import com.steady.db.Tag
 import com.steady.db.Txn
@@ -112,6 +115,26 @@ fun TagScreen(
                     items(txnData, key = { it.id }) {
                         TxnCard(it, listOf())
                     }
+                }
+            }
+            if (showFilterDialog) {
+                TidyDialog(
+                    title = "Filter",
+                    onDismissRequest = { showFilterDialog = false },
+                    buttons = {
+                        TextButton(onClick = {
+                            showFilterDialog = false
+                        }) {
+                            Text("Close")
+                        }
+                        TextButton(onClick = {
+
+                        }) {
+                            Text("Ok")
+                        }
+                    }
+                ) {
+
                 }
             }
         }
