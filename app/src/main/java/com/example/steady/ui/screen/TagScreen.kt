@@ -23,8 +23,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -50,11 +56,24 @@ fun TagScreen(
 ) {
     var tag: Tag by remember { mutableStateOf(Tag(0, "")) }
     var txnList: List<Txn> by remember { mutableStateOf(listOf()) }
+    var showFilterDialog by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         tag = tagViewModel.tag
         txnList = tagViewModel.getTxnList(tag.id)
     }
     Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showFilterDialog = true },
+                modifier = Modifier.size(80.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FilterList,
+                    contentDescription = "Filter"
+                )
+
+            }
+        },
         modifier = Modifier.fillMaxSize()
     )
     { innerPadding ->
