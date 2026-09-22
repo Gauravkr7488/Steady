@@ -30,7 +30,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
@@ -53,7 +52,6 @@ import com.example.steady.Utils
 import com.example.steady.ui.component.button.OutlinedDropDownButton
 import com.example.steady.ui.component.card.TxnCard
 import com.example.steady.ui.component.dialog.TidyDialog
-import com.example.steady.ui.component.menu.OutlinedMenuItem
 import com.example.steady.viewmodel.TagViewModel
 import com.steady.db.Tag
 import com.steady.db.Txn
@@ -93,12 +91,17 @@ fun TagScreen(
                 .padding(top = innerPadding.calculateTopPadding())
                 .padding(start = 5.dp, end = 5.dp)
         ) {
+            val filteredTxnList: List<Txn> = when (typeFilter) {
+                "RECEIVED" -> txnList.filter { it.amount > 0L }
+                "SPENT" -> txnList.filter { it.amount < 0L }
+                else -> txnList
+            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(8.dp)
             ) {
                 var total = 0L
-                txnList.forEach { if (!it.suspendedStatus) total += it.amount }
+                filteredTxnList.forEach { if (!it.suspendedStatus) total += it.amount }
                 Text("Total")
                 Spacer(Modifier.weight(1f))
                 Text(total.toString(), style = MaterialTheme.typography.displayMedium)
@@ -108,7 +111,7 @@ fun TagScreen(
                 verticalArrangement = Arrangement.spacedBy(1.dp),
                 contentPadding = PaddingValues(bottom = 150.dp)
             ) {
-                val group = txnList
+                val group = filteredTxnList
                     .sortedByDescending { it.createdAt }
                     .groupBy { Utils.formatDayHeader(it.createdAt) }
                 group.forEach { (label, txnData) ->
@@ -148,10 +151,11 @@ fun TagScreen(
                     )
                     FilterMenuItems(
                         menuName = "Type",
-                        dropDownButtonLabel = if (typeFilter == "") "All" else typeList.first { it.second == typeFilter }.first ,
+                        dropDownButtonLabel = if (typeFilter == "") "All" else typeList.first { it.second == typeFilter }.first,
                         menuItems = typeList
                     ) {
                         typeFilter = it
+                        showFilterDialog = false
                     }
                 }
             }
